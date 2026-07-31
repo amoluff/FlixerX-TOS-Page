@@ -1,91 +1,763 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlixerX Terms of Service</title>
+<title>FlixerX — شروط الخدمة</title>
 <style>
-  /* خلفية تدريجية بنفسجي-أسود */
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a001a, #0d0d0d);
-    color: #e0e0ff;
-    line-height: 1.7;
+  :root{
+    --bg: #050506;
+    --bg-alt: #0a0a0d;
+    --accent: #C41EFF;
+    --accent-dim: #7a12a3;
+    --text: #eae7ee;
+    --text-dim: #948f9e;
+    --line: rgba(196,30,255,0.14);
+    --card: rgba(255,255,255,0.02);
+    --font-ar: 'Tajawal', 'Segoe UI', sans-serif;
+    --font-en: 'Space Grotesk', 'Inter', sans-serif;
   }
 
-  /* Container مركزي */
-  .container {
-    max-width: 850px;
-    margin: 50px auto;
-    padding: 40px;
-    background: rgba(30, 0, 50, 0.85);
-    border-radius: 20px;
-    box-shadow: 0 0 30px rgba(128,0,128,0.7);
-    border: 2px solid #800080;
+  @font-face{
+    font-family:'Space Grotesk';
+    src: local('Space Grotesk');
   }
 
-  h1, h2 {
-    color: #d580ff;
-    text-align: center;
-    margin-bottom: 20px;
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-ar);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
   }
 
-  ul {
-    list-style-type: disc;
-    margin-left: 30px;
+  body.lang-en{
+    font-family:var(--font-en);
   }
 
-  a {
-    color: #d580ff;
-    text-decoration: none;
-    font-weight: bold;
+  /* ===== Animated triangle background ===== */
+  #tri-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    pointer-events:none;
   }
 
-  a:hover {
-    text-decoration: underline;
-    color: #ff99ff;
+  .bg-glow{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -5%, rgba(196,30,255,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 100%, rgba(196,30,255,0.07), transparent 60%);
+    pointer-events:none;
   }
 
-  p {
-    margin-bottom: 18px;
+  /* ===== Layout shell ===== */
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width:860px;
+    margin:0 auto;
+    padding:0 24px 120px;
   }
 
-  /* Footer */
-  footer {
-    text-align: center;
-    margin-top: 30px;
-    font-size: 0.9em;
-    color: #c0c0ff;
+  /* ===== Top bar ===== */
+  header{
+    position:sticky;
+    top:0;
+    z-index:10;
+    backdrop-filter: blur(14px);
+    background:rgba(5,5,6,0.72);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    max-width:860px;
+    margin:0 auto;
+    padding:18px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    font-size:17px;
+    letter-spacing:0.02em;
+  }
+  .brand .mark{
+    width:26px;height:26px;
+    position:relative;
+    display:inline-block;
+  }
+  .brand .mark svg{width:100%;height:100%;display:block;}
+  .brand span.code{
+    color:var(--accent);
+    font-family:var(--font-en);
+    font-weight:600;
   }
 
-  /* Responsive */
-  @media screen and (max-width: 600px) {
-    .container {
-      padding: 25px;
-      margin: 30px 15px;
-    }
+  /* language toggle */
+  .lang-toggle{
+    position:relative;
+    display:flex;
+    align-items:center;
+    background:rgba(196,30,255,0.06);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px;
+    cursor:pointer;
+    user-select:none;
+    font-family:var(--font-en);
+  }
+  .lang-toggle .opt{
+    position:relative;
+    z-index:2;
+    padding:6px 14px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    color:var(--text-dim);
+    transition:color .3s ease;
+  }
+  .lang-toggle .opt.active{ color:#050506; }
+  .lang-toggle .pill{
+    position:absolute;
+    top:3px; bottom:3px;
+    width:calc(50% - 3px);
+    border-radius:999px;
+    background:var(--accent);
+    box-shadow:0 0 18px rgba(196,30,255,0.55);
+    transition:transform .35s cubic-bezier(.65,0,.35,1);
+    z-index:1;
+  }
+  body.lang-en .lang-toggle .pill{ transform:translateX(100%); }
+  html[dir="rtl"] body.lang-en .lang-toggle .pill{ transform:translateX(-100%); }
+
+  /* ===== Hero ===== */
+  .hero{
+    padding:72px 0 40px;
+    text-align:start;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-family:var(--font-en);
+    margin-bottom:18px;
+    padding:6px 12px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:rgba(196,30,255,0.05);
+  }
+  .eyebrow::before{
+    content:'';
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 8px var(--accent);
+  }
+  h1{
+    font-size:clamp(32px,5.5vw,52px);
+    line-height:1.15;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin-bottom:16px;
+  }
+  h1 .hl{
+    color:var(--accent);
+    text-shadow:0 0 26px rgba(196,30,255,0.45);
+  }
+  .hero p.lead{
+    font-size:16.5px;
+    line-height:1.9;
+    color:var(--text-dim);
+    max-width:620px;
+  }
+  .hero .meta{
+    margin-top:28px;
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    font-family:var(--font-en);
+    font-size:12.5px;
+    color:var(--text-dim);
+  }
+  .hero .meta b{ color:var(--text); font-weight:600; }
+
+  /* ===== TOC ===== */
+  .toc{
+    margin-top:44px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--card);
+    padding:22px 24px;
+  }
+  .toc-title{
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-family:var(--font-en);
+    margin-bottom:14px;
+  }
+  .toc ol{
+    list-style:none;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 20px;
+  }
+  .toc a{
+    color:var(--text-dim);
+    text-decoration:none;
+    font-size:14px;
+    display:flex;
+    gap:8px;
+    align-items:baseline;
+    transition:color .2s ease;
+    padding:4px 0;
+  }
+  .toc a:hover{ color:var(--accent); }
+  .toc a .n{
+    font-family:var(--font-en);
+    color:var(--accent-dim);
+    font-size:12px;
+    min-width:18px;
+  }
+
+  /* ===== Sections ===== */
+  section.clause{
+    margin-top:56px;
+    scroll-margin-top:100px;
+  }
+  .clause-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .clause-num{
+    font-family:var(--font-en);
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:rgba(196,30,255,0.08);
+    border:1px solid var(--line);
+    width:34px;height:34px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  h2{
+    font-size:21px;
+    font-weight:700;
+    letter-spacing:-0.005em;
+  }
+  .clause-body{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:2;
+  }
+  .clause-body p{ margin-bottom:14px; }
+  .clause-body ul{
+    list-style:none;
+    margin:14px 0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .clause-body li{
+    position:relative;
+    padding-inline-start:22px;
+    line-height:1.8;
+  }
+  .clause-body li::before{
+    content:'';
+    position:absolute;
+    inset-inline-start:0;
+    top:9px;
+    width:7px;height:7px;
+    background:var(--accent);
+    border-radius:2px;
+    transform:rotate(45deg);
+    box-shadow:0 0 6px rgba(196,30,255,0.6);
+  }
+  .clause-body b, .clause-body strong{
+    color:var(--text);
+    font-weight:600;
+  }
+
+  hr.divider{
+    border:none;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--line), transparent);
+    margin:56px 0 0;
+  }
+
+  /* ===== Footer ===== */
+  footer{
+    margin-top:70px;
+    padding-top:36px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  footer .fbrand{
+    font-family:var(--font-en);
+    font-size:13px;
+    color:var(--text-dim);
+  }
+  footer .fbrand span{ color:var(--accent); }
+  footer .flinks{
+    display:flex;
+    gap:20px;
+    font-size:13px;
+  }
+  footer .flinks a{
+    color:var(--text-dim);
+    text-decoration:none;
+    transition:color .2s ease;
+  }
+  footer .flinks a:hover{ color:var(--accent); }
+
+  /* language visibility */
+  [data-lang]{ display:none; }
+  body:not(.lang-en) [data-lang="ar"]{ display:block; }
+  body.lang-en [data-lang="en"]{ display:block; }
+  body:not(.lang-en) span[data-lang="ar"]{ display:inline; }
+  body.lang-en span[data-lang="en"]{ display:inline; }
+
+  @media (max-width:640px){
+    .toc ol{ grid-template-columns:1fr; }
+    .hero{ padding:54px 0 30px; }
+    footer{ flex-direction:column; align-items:flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #tri-canvas{ display:none; }
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>FlixerX Terms of Service</h1>
-  <p>Welcome to FlixerX! By using this bot, you agree to the following terms. Please read carefully:</p>
 
-  <ul>
-    <li>Do not misuse the bot or its commands.</li>
-    <li>The developer is not responsible for any data loss on your server.</li>
-    <li>You may remove the bot from your server at any time.</li>
-    <li>FlixerX does not collect your private messages.</li>
-    <li>All moderation and security actions are logged.</li>
-    <li>Respect Discord's Terms of Service and community guidelines.</li>
-  </ul>
+<canvas id="tri-canvas"></canvas>
+<div class="bg-glow"></div>
 
-  <p>For details on data usage and privacy, see our <a href="https://privacy-flixerx.netlify.app/">Privacy Policy</a>.</p>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L22 20H2L12 2Z" stroke="#C41EFF" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>FlixerX <span class="code">FLX</span></span>
+    </div>
+    <div class="lang-toggle" id="langToggle" role="button" aria-label="Toggle language">
+      <div class="pill"></div>
+      <span class="opt" data-opt="ar">عربي</span>
+      <span class="opt" data-opt="en">EN</span>
+    </div>
+  </div>
+</header>
 
-  <footer>&copy; 2026 FlixerX - All rights reserved</footer>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="eyebrow" data-lang="ar">وثيقة قانونية</span>
+    <span class="eyebrow" data-lang="en">Legal document</span>
+
+    <h1 data-lang="ar">شروط <span class="hl">الخدمة</span></h1>
+    <h1 data-lang="en">Terms of <span class="hl">Service</span></h1>
+
+    <p class="lead" data-lang="ar">يرجى قراءة شروط الخدمة التالية بعناية قبل استخدام بوت FlixerX (FLX) أو أي من خدماته. باستخدامك للبوت أو الموقع أو أي خدمة مرتبطة به، فإنك توافق على الالتزام بهذه الشروط والأحكام.</p>
+    <p class="lead" data-lang="en">Please read the following Terms of Service carefully before using FlixerX (FLX) or any of its services. By using the bot, the website, or any related service, you agree to be bound by these terms and conditions.</p>
+
+    <div class="meta">
+      <div data-lang="ar"><b>آخر تحديث:</b> 2026</div>
+      <div data-lang="en"><b>Last updated:</b> 2026</div>
+      <div data-lang="ar"><b>الحالة:</b> ساري المفعول</div>
+      <div data-lang="en"><b>Status:</b> In effect</div>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <div class="toc-title" data-lang="ar">جدول المحتويات</div>
+    <div class="toc-title" data-lang="en">Table of contents</div>
+    <ol id="tocList"></ol>
+  </nav>
+
+  <!-- 01 -->
+  <section class="clause" id="s1">
+    <div class="clause-head">
+      <div class="clause-num">01</div>
+      <h2 data-lang="ar">التمهيد</h2>
+      <h2 data-lang="en">Introduction</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">يرحب بكم FlixerX (FLX)، وهو بوت مخصص لإدارة وحماية سيرفرات Discord وتقديم العديد من الأدوات والميزات الإدارية والترفيهية.</p>
+      <p data-lang="en">Welcome to FlixerX (FLX), a bot dedicated to managing and protecting Discord servers, offering a wide range of administrative and entertainment tools and features.</p>
+      <p data-lang="ar">يُعد استخدام البوت أو أي من خدماته موافقةً كاملة على جميع الشروط والأحكام الواردة في هذه الصفحة.</p>
+      <p data-lang="en">Using the bot or any of its services constitutes full agreement to all terms and conditions on this page.</p>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="clause" id="s2">
+    <div class="clause-head">
+      <div class="clause-num">02</div>
+      <h2 data-lang="ar">التعريفات</h2>
+      <h2 data-lang="en">Definitions</h2>
+    </div>
+    <div class="clause-body">
+      <ul data-lang="ar">
+        <li><b>البوت:</b> FlixerX (FLX).</li>
+        <li><b>المستخدم:</b> أي شخص يستخدم البوت أو الموقع أو إحدى خدماته.</li>
+        <li><b>الخدمة:</b> جميع الميزات والأوامر ولوحة التحكم والخدمات الرقمية التي يقدمها FlixerX.</li>
+        <li><b>الاتفاقية:</b> هذه الشروط والأحكام وجميع التحديثات المستقبلية عليها.</li>
+      </ul>
+      <ul data-lang="en">
+        <li><b>The Bot:</b> FlixerX (FLX).</li>
+        <li><b>The User:</b> any person who uses the bot, the website, or any of its services.</li>
+        <li><b>The Service:</b> all features, commands, the dashboard, and digital services provided by FlixerX.</li>
+        <li><b>The Agreement:</b> these terms and conditions and all future updates to them.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="clause" id="s3">
+    <div class="clause-head">
+      <div class="clause-num">03</div>
+      <h2 data-lang="ar">أهلية الاستخدام</h2>
+      <h2 data-lang="en">Eligibility</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">باستخدام FlixerX فإنك تقر بما يلي:</p>
+      <p data-lang="en">By using FlixerX, you acknowledge the following:</p>
+      <ul data-lang="ar">
+        <li>أنك تستخدم البوت بطريقة قانونية ومسؤولة.</li>
+        <li>أن جميع المعلومات التي تقدمها صحيحة.</li>
+        <li>أنك تتحمل مسؤولية استخدام حسابك وأوامرك داخل Discord.</li>
+        <li>أنك لن تستخدم البوت لأي نشاط مخالف للقوانين أو لشروط استخدام Discord.</li>
+      </ul>
+      <ul data-lang="en">
+        <li>You use the bot in a lawful and responsible manner.</li>
+        <li>All information you provide is accurate.</li>
+        <li>You are responsible for your account and your commands within Discord.</li>
+        <li>You will not use the bot for any activity that violates applicable laws or Discord's Terms of Service.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="clause" id="s4">
+    <div class="clause-head">
+      <div class="clause-num">04</div>
+      <h2 data-lang="ar">طبيعة الخدمة</h2>
+      <h2 data-lang="en">Nature of the Service</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">يعمل فريق FlixerX على توفير خدمة مستقرة وآمنة قدر الإمكان، ومع ذلك:</p>
+      <p data-lang="en">The FlixerX team works to provide a stable and secure service as much as possible; however:</p>
+      <ul data-lang="ar">
+        <li>قد تخضع بعض الخدمات للصيانة أو التحديث دون إشعار مسبق.</li>
+        <li>لا نضمن توفر جميع الخدمات بنسبة 100% في جميع الأوقات.</li>
+        <li>لا يتحمل FlixerX أي مسؤولية عن الأضرار الناتجة عن سوء استخدام البوت أو إساءة إعداداته.</li>
+      </ul>
+      <ul data-lang="en">
+        <li>Some services may undergo maintenance or updates without prior notice.</li>
+        <li>We do not guarantee 100% availability of all services at all times.</li>
+        <li>FlixerX bears no responsibility for damages resulting from misuse of the bot or misconfiguration of its settings.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="clause" id="s5">
+    <div class="clause-head">
+      <div class="clause-num">05</div>
+      <h2 data-lang="ar">ضوابط الاستخدام</h2>
+      <h2 data-lang="en">Usage Restrictions</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">يُمنع استخدام FlixerX في:</p>
+      <p data-lang="en">It is prohibited to use FlixerX for:</p>
+      <ul data-lang="ar">
+        <li>انتهاك قوانين أو شروط Discord.</li>
+        <li>إرسال الرسائل المزعجة (Spam).</li>
+        <li>الإساءة أو التحرش بالمستخدمين.</li>
+        <li>أي نشاط غير قانوني أو ضار.</li>
+        <li>محاولة استغلال ثغرات أو العبث بأنظمة البوت.</li>
+      </ul>
+      <ul data-lang="en">
+        <li>Violating applicable laws or Discord's Terms of Service.</li>
+        <li>Sending spam messages.</li>
+        <li>Abusing or harassing other users.</li>
+        <li>Any illegal or harmful activity.</li>
+        <li>Attempting to exploit vulnerabilities or tamper with the bot's systems.</li>
+      </ul>
+      <p data-lang="ar">ويحق لإدارة FlixerX تعليق أو حظر أي مستخدم أو سيرفر يخالف هذه الشروط دون إشعار مسبق.</p>
+      <p data-lang="en">FlixerX management reserves the right to suspend or ban any user or server that violates these terms without prior notice.</p>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="clause" id="s6">
+    <div class="clause-head">
+      <div class="clause-num">06</div>
+      <h2 data-lang="ar">الخدمات المدفوعة</h2>
+      <h2 data-lang="en">Paid Services</h2>
+    </div>
+    <div class="clause-body">
+      <ul data-lang="ar">
+        <li>قد يوفر FlixerX ميزات أو اشتراكات مدفوعة.</li>
+        <li>يتم تفعيل الخدمة بعد تأكيد عملية الدفع.</li>
+        <li>تختلف المزايا حسب نوع الاشتراك.</li>
+        <li>في حال وجود خلل تقني من طرف FlixerX، سيتم العمل على إصلاحه في أسرع وقت ممكن.</li>
+      </ul>
+      <ul data-lang="en">
+        <li>FlixerX may offer paid features or subscriptions.</li>
+        <li>The service is activated after payment confirmation.</li>
+        <li>Benefits vary depending on the subscription type.</li>
+        <li>In the event of a technical issue on FlixerX's side, we will work to resolve it as quickly as possible.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="clause" id="s7">
+    <div class="clause-head">
+      <div class="clause-num">07</div>
+      <h2 data-lang="ar">الاستبدال والاسترجاع</h2>
+      <h2 data-lang="en">Refunds &amp; Exchanges</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">نظرًا لأن الخدمات المقدمة رقمية، فإن عمليات الاسترجاع أو الاستبدال بعد التفعيل لا تكون متاحة، إلا في الحالات التي يثبت فيها وجود مشكلة تقنية ناتجة عن FlixerX ولم يكن بالإمكان حلها.</p>
+      <p data-lang="en">Since the services provided are digital, refunds or exchanges after activation are not available, except in cases where a technical issue caused by FlixerX is confirmed and could not be resolved.</p>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="clause" id="s8">
+    <div class="clause-head">
+      <div class="clause-num">08</div>
+      <h2 data-lang="ar">وسائل التواصل</h2>
+      <h2 data-lang="en">Contact Channels</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">يتم التواصل الرسمي مع المستخدمين عبر:</p>
+      <p data-lang="en">Official communication with users takes place through:</p>
+      <ul data-lang="ar">
+        <li>سيرفر Discord الرسمي.</li>
+        <li>الموقع الرسمي.</li>
+        <li>أي قناة رسمية تعلن عنها إدارة FlixerX.</li>
+      </ul>
+      <ul data-lang="en">
+        <li>The official Discord server.</li>
+        <li>The official website.</li>
+        <li>Any official channel announced by FlixerX management.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section class="clause" id="s9">
+    <div class="clause-head">
+      <div class="clause-num">09</div>
+      <h2 data-lang="ar">الملكية الفكرية</h2>
+      <h2 data-lang="en">Intellectual Property</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">جميع الحقوق المتعلقة بـ FlixerX محفوظة، وتشمل:</p>
+      <p data-lang="en">All rights related to FlixerX are reserved, including:</p>
+      <ul data-lang="ar">
+        <li>اسم FlixerX.</li>
+        <li>الشعار.</li>
+        <li>الموقع.</li>
+        <li>لوحة التحكم.</li>
+        <li>البرمجة والأكواد.</li>
+        <li>التصاميم والهوية البصرية.</li>
+      </ul>
+      <ul data-lang="en">
+        <li>The FlixerX name.</li>
+        <li>The logo.</li>
+        <li>The website.</li>
+        <li>The dashboard.</li>
+        <li>The code and programming.</li>
+        <li>The designs and visual identity.</li>
+      </ul>
+      <p data-lang="ar">ولا يجوز نسخ أو إعادة استخدام أي جزء منها دون إذن مسبق من إدارة FlixerX.</p>
+      <p data-lang="en">No part of these may be copied or reused without prior permission from FlixerX management.</p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="clause" id="s10">
+    <div class="clause-head">
+      <div class="clause-num">10</div>
+      <h2 data-lang="ar">إخلاء المسؤولية</h2>
+      <h2 data-lang="en">Disclaimer</h2>
+    </div>
+    <div class="clause-body">
+      <p data-lang="ar">يُستخدم البوت كما هو (As Is)، وتسعى إدارة FlixerX لتقديم أفضل تجربة ممكنة، لكنها لا تتحمل أي مسؤولية عن الأضرار الناتجة عن سوء الاستخدام أو الأعطال الخارجة عن إرادتها.</p>
+      <p data-lang="en">The bot is provided "as is." FlixerX management strives to deliver the best possible experience, but bears no responsibility for damages resulting from misuse or failures beyond its control.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <footer>
+    <div class="fbrand">
+      <span data-lang="ar">FlixerX <span>(FLX)</span> — بوت متكامل لإدارة وحماية سيرفرات Discord</span>
+      <span data-lang="en">FlixerX <span>(FLX)</span> — a complete Discord server management &amp; protection bot</span>
+    </div>
+    <div class="flinks">
+      <span data-lang="ar">© 2026 FlixerX (FLX). جميع الحقوق محفوظة.</span>
+      <span data-lang="en">© 2026 FlixerX (FLX). All rights reserved.</span>
+    </div>
+  </footer>
+
 </div>
+
+<script>
+/* ---------- Language toggle ---------- */
+const body = document.body;
+const toggle = document.getElementById('langToggle');
+
+function setLang(lang){
+  if(lang === 'en'){
+    body.classList.add('lang-en');
+    document.documentElement.setAttribute('lang','en');
+    document.documentElement.setAttribute('dir','ltr');
+  } else {
+    body.classList.remove('lang-en');
+    document.documentElement.setAttribute('lang','ar');
+    document.documentElement.setAttribute('dir','rtl');
+  }
+  document.querySelectorAll('.opt').forEach(o=>{
+    o.classList.toggle('active', o.dataset.opt === lang);
+  });
+  buildTOC();
+  localStorage.setItem('flx_lang', lang);
+}
+
+toggle.addEventListener('click', ()=>{
+  const current = body.classList.contains('lang-en') ? 'en' : 'ar';
+  setLang(current === 'en' ? 'ar' : 'en');
+});
+
+/* build table of contents dynamically per language */
+function buildTOC(){
+  const lang = body.classList.contains('lang-en') ? 'en' : 'ar';
+  const sections = document.querySelectorAll('section.clause');
+  const list = document.getElementById('tocList');
+  list.innerHTML = '';
+  sections.forEach((sec)=>{
+    const num = sec.querySelector('.clause-num').textContent;
+    const h2 = sec.querySelector(`h2[data-lang="${lang}"]`);
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.innerHTML = `<span class="n">${num}</span><span>${h2.textContent}</span>`;
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+}
+
+/* init: try saved preference, else default ar */
+const saved = localStorage.getItem('flx_lang');
+setLang(saved === 'en' ? 'en' : 'ar');
+
+/* ---------- Triangle particle background ---------- */
+const canvas = document.getElementById('tri-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+const COLOR = [196,30,255];
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function rand(min,max){ return Math.random()*(max-min)+min; }
+
+function makeParticle(){
+  const size = rand(6, 22);
+  return {
+    x: rand(0, W),
+    y: rand(0, H),
+    size,
+    speedY: rand(0.06, 0.28) * (Math.random()<0.5?1:-1),
+    speedX: rand(-0.08, 0.08),
+    rot: rand(0, Math.PI*2),
+    rotSpeed: rand(-0.002, 0.002),
+    alpha: rand(0.05, 0.22),
+    pulse: rand(0, Math.PI*2),
+    pulseSpeed: rand(0.004, 0.012)
+  };
+}
+
+const COUNT = Math.round(Math.min(70, Math.max(28, (window.innerWidth*window.innerHeight)/28000)));
+for(let i=0;i<COUNT;i++) particles.push(makeParticle());
+
+function drawTriangle(p){
+  const glowAlpha = p.alpha * (0.6 + 0.4*Math.sin(p.pulse));
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.rot);
+  ctx.beginPath();
+  const s = p.size;
+  ctx.moveTo(0, -s);
+  ctx.lineTo(s*0.87, s*0.5);
+  ctx.lineTo(-s*0.87, s*0.5);
+  ctx.closePath();
+  ctx.strokeStyle = `rgba(${COLOR[0]},${COLOR[1]},${COLOR[2]},${glowAlpha})`;
+  ctx.lineWidth = 1;
+  ctx.shadowColor = `rgba(${COLOR[0]},${COLOR[1]},${COLOR[2]},${glowAlpha*1.4})`;
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function tick(){
+  ctx.clearRect(0,0,W,H);
+  for(const p of particles){
+    p.y += p.speedY;
+    p.x += p.speedX;
+    p.rot += p.rotSpeed;
+    p.pulse += p.pulseSpeed;
+    if(p.y < -30) p.y = H+30;
+    if(p.y > H+30) p.y = -30;
+    if(p.x < -30) p.x = W+30;
+    if(p.x > W+30) p.x = -30;
+    drawTriangle(p);
+  }
+  if(!reduceMotion) requestAnimationFrame(tick);
+}
+if(!reduceMotion) requestAnimationFrame(tick);
+else { tick(); }
+</script>
 </body>
 </html>
